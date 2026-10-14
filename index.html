@@ -133,6 +133,7 @@ body{
   padding:7px 12px; border-radius:2px; border:1px solid var(--rule);
   background:transparent; color:var(--ink); cursor:pointer;
 }
+a.btn{text-decoration:none; display:inline-flex; align-items:center}
 .btn:hover{border-color:var(--seal); color:var(--seal)}
 .btn:focus-visible{outline:2px solid var(--seal); outline-offset:2px}
 
@@ -268,7 +269,8 @@ body{
         <div class="card-ft">
           <button class="btn primary" id="shotShare" type="button" hidden>送る</button>
           <button class="btn" id="shotSave" type="button">画像を保存</button>
-          <span class="note" id="shotNote">保存できないときは画像を長押し（PC は右クリック）してください。</span>
+          <a class="btn" id="shotX" href="#" target="_blank" rel="noopener">X で共有</a>
+          <span class="note" id="shotNote">保存できないときは画像を長押し（PC は右クリック）してください。X は画像が自動で付かないので、保存してから投稿画面で添付してください。</span>
         </div>
       </div>
     </div>
@@ -644,6 +646,7 @@ document.getElementById("bowlimg").src = IMGSRC.bowl;
       shotImg.src = url;
       sheet.hidden = false;
       shotBlob = null;
+      updateX();
       if (cv.toBlob) {
         cv.toBlob(function (b) {
           shotBlob = b;
@@ -699,6 +702,21 @@ document.getElementById("bowlimg").src = IMGSRC.bowl;
   }
 
   function setNote(t) { document.getElementById("shotNote").textContent = t; }
+
+  // X の投稿画面を開くリンク。画像は X 側の仕様で自動添付できないので、
+  // 文章と URL だけ用意して、画像は投稿画面で添付してもらう。
+  var SITE = "https://nulock.github.io/ramen/";
+  function updateX() {
+    var who = fTeam.value.trim();
+    var gu = placed.reduce(function (s, p) { return s + BY_ID[p.id].yen; }, 0);
+    var t = (who ? who + "／" : "") +
+            "具材 " + placed.length + " 点、合計 " + (gu + BASE).toLocaleString("ja-JP") +
+            "円の一杯を盛り付けました！";
+    document.getElementById("shotX").href =
+      "https://x.com/intent/post?text=" + encodeURIComponent(t) +
+      "&url=" + encodeURIComponent(SITE) +
+      "&hashtags=" + encodeURIComponent("麺屋新六,NULOCK,新大祭2026");
+  }
 
   document.getElementById("shotSave").addEventListener("click", saveShot);
 
